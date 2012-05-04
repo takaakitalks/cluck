@@ -1,0 +1,17 @@
+application: cluck
+version: 1
+runtime: python
+api_version: 1
+
+handlers:
+- url: /filet/css
+  static_dir: filet/css
+
+- url: /filet/js
+  static_dir: filet/js 
+
+- url: /filet/.*
+  script: filet/server.py
+
+- url: /.*
+  script: cluck.py

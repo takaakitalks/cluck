@@ -1,0 +1,120 @@
+<html>
+  <head>
+		<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Fillet!</title>
+		<link rel="stylesheet" href="css/basic.css" type="text/css" />
+		<link rel="stylesheet" href="css/galleriffic-2.css" type="text/css" />
+		<script type="text/javascript">
+			document.write('<style>.noscript { display: none; }</style>');
+      var fb_data = {{result}};
+		</script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-1.7.min.js"></script>
+    <script type="text/javascript" src="js/fb.js"></script>
+		<script type="text/javascript" src="js/jquery.galleriffic.js"></script>
+    <script type="text/javascript" src="js/jquery.opacityrollover.js"></script>
+	</head>
+	<body>
+		<div id="page">
+			<div id="container">
+				<h1><a href="index.html">Fillet! (experimental)</a></h1>
+				<h2>Take a peek at what your friends are up to :)</h2>
+
+				<!-- Start Advanced Gallery Html Containers -->
+				<div id="gallery" class="content">
+				  <div id="thumbs" class="navigation">
+					  <ul class="thumbs noscript">
+					  </ul>
+				  </div>
+					<div id="controls" class="controls"></div>
+					<div class="slideshow-container">
+						<div id="loading" class="loader"></div>
+						<div id="slideshow" class="slideshow"></div>
+					</div>
+					<div id="caption" class="caption-container"></div>
+				</div>
+				<div style="clear: both;"></div>
+			</div>
+		</div>
+		<div id="footer">&copy; 2012 CLUCK</div>
+		<script type="text/javascript">
+			jQuery(document).ready(function($) {
+        var dm = new DataManager();
+        dm.parse(fb_data);
+        dm.createList();
+
+				// We only want these styles applied when javascript is enabled
+				$('div.navigation').css({'width' : '95%', 'float' : 'left', 'left': '5%'});
+				$('div.content').css('display', 'block');
+
+				// Initially set opacity on thumbs and add
+				// additional styling for hover effect on thumbs
+				var onMouseOutOpacity = 0.67;
+				$('#thumbs ul.thumbs li').opacityrollover({
+					mouseOutOpacity:   onMouseOutOpacity,
+					mouseOverOpacity:  1.0,
+					fadeSpeed:         'fast',
+					exemptionSelector: '.selected'
+				});
+				
+				// Initialize Advanced Galleriffic Gallery
+				var gallery = $('#thumbs').galleriffic({
+					delay:                     4000,
+					numThumbs:                 20,
+					preloadAhead:              10,
+					enableTopPager:            false,
+					enableBottomPager:         false,
+					//maxPagesToShow:            7,
+					imageContainerSel:         '#slideshow',
+					controlsContainerSel:      '#controls',
+					captionContainerSel:       '#caption',
+					loadingContainerSel:       '#loading',
+					renderSSControls:          true,
+					renderNavControls:         true,
+					playLinkText:              'Play Slideshow',
+					pauseLinkText:             'Pause Slideshow',
+					prevLinkText:              '&lsaquo; Previous Photo',
+					nextLinkText:              'Next Photo &rsaquo;',
+					nextPageLinkText:          'Next &rsaquo;',
+					prevPageLinkText:          '&lsaquo; Prev',
+					enableHistory:             false,
+					autoStart:                 true,
+					syncTransitions:           true,
+					defaultTransitionDuration: 1500,
+					onSlideChange:             function(prevIndex, nextIndex) {
+						// 'this' refers to the gallery, which is an extension of $('#thumbs')
+						this.find('ul.thumbs').children()
+							.eq(prevIndex).fadeTo('fast', onMouseOutOpacity).end()
+							.eq(nextIndex).fadeTo('fast', 1.0);
+            // Update the photo index display
+            this.$captionContainer.find('div.photo-index')
+              .html('Photo '+ (nextIndex+1) +' of '+ this.data.length);
+					},
+					onPageTransitionOut:       function(callback) {
+						this.fadeTo('fast', 0.0, callback);
+					},
+					onPageTransitionIn:        function() {
+            var prevPageLink = this.find('a.prev').css('visibility', 'hidden');
+            var nextPageLink = this.find('a.next').css('visibility', 'hidden');
+
+            // Show appropriate next / prev page links
+            if (this.displayedPage > 0)
+              prevPageLink.css('visibility', 'visible');
+            var lastPage = this.getNumPages() - 1;
+              if (this.displayedPage < lastPage)
+                nextPageLink.css('visibility', 'visible');
+
+            this.fadeTo('fast', 1.0);
+					}
+				});
+        gallery.find('a.prev').click(function(e) {
+          gallery.previousPage();
+          e.preventDefault();
+        });
+        gallery.find('a.next').click(function(e) {
+          gallery.nextPage();
+          e.preventDefault();
+        });
+			});
+		</script>
+	</body>
+</html>
